@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.python-version
+
+# results / temp
+results/
+*.tmp
+_tmp_*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 개인용 한글 설명서 (업로드 안 함)
+README_KR.md
