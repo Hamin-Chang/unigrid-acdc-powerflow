@@ -1,8 +1,6 @@
-"""Basic example: run one AC/DC power flow.
+"""UniGrid — run one AC/DC power flow.
 
-The two key lines are:
-    case   = load_acdc_case(...)   # load an Excel grid file as an editable table
-    result = run_acdc(case)        # run the AC/DC power flow
+HOW TO USE: edit the SETTINGS block below, then press Run (the ▶ button).
 """
 
 from pathlib import Path
@@ -14,37 +12,59 @@ from acdc_engine import run_acdc
 from result_columns import to_df
 
 
-# Show full tables in the terminal (don't truncate rows/columns).
+# ════════════════════════════════════════════════════════════════
+#  SETTINGS  —  edit here, then press Run (▶)
+# ════════════════════════════════════════════════════════════════
+
+# 1) Pick a grid: keep ONE line without the leading "#".
+GRID = "grids/ACDC_matacdc_case24_ieee_rts1996_3zones.xlsx"   # transmission  50/7
+# GRID = "grids/ACDC_matacdc_stagg5_droop.xlsx"               # transmission   5/3
+# GRID = "grids/ACDC_CIGRE_Benchmark.xlsx"                    # distribution  14/11
+# GRID = "grids/ACDC_91bus_regional_distribution.xlsx"        # distribution  91/3
+# GRID = "grids/ACDC_71bus_3IC_parallel.xlsx"                 # microgrid     38/33
+# GRID = "grids/ACDC_12bus_paper.xlsx"                        # microgrid      6/6
+# GRID = "grids/your_own_file.xlsx"                           # your own grid
+
+# 2) (optional) Scale all AC loads.  1.0 = no change, 1.1 = +10%, 0.9 = -10%.
+LOAD_SCALE = 1.0
+
+# 3) (optional) Finer tweaks: edit the Excel file directly, or add lines such as
+#       case.AC_gen_dat.iloc[0, 5] *= 1.2          # +20% on the first generator
+#    just below where `case` is loaded (see "apply settings" section).
+# ════════════════════════════════════════════════════════════════
+
+
+here = Path(__file__).resolve().parent
 pd.set_option("display.max_rows", None)
 pd.set_option("display.max_columns", None)
 pd.set_option("display.width", None)
 
-here = Path(__file__).resolve().parent
+# ── Load the grid, apply settings, run ──────────────────────────
+case = load_acdc_case(here / GRID)
 
-# 1) Load the Excel grid file as a case (table).
-#    >>> Change this filename to run your own grid file. <<<
-case = load_acdc_case(here / "grids" / "ACDC_matacdc_case24_ieee_rts1996_3zones.xlsx")
+if LOAD_SCALE != 1.0:                       # apply settings
+    case.AC_PLoad_dat.iloc[:, 1:] *= LOAD_SCALE
+    case.AC_QLoad_dat.iloc[:, 1:] *= LOAD_SCALE
+# (add your own case.* edits here)
 
-# 2) Run the AC/DC power flow.
 result = run_acdc(case)
 
-# 3) Build labeled result tables (each column carries its unit).
+# ── Build labeled result tables ─────────────────────────────────
 ac     = to_df(result, "AC_result")
 dc     = to_df(result, "DC_result")
 branch = to_df(result, "Branch_result")
 loss   = to_df(result, "total_loss_table")
-
-# VSC detail tables exist only when the case uses detailed (non-ideal) VSC converters.
 has_vsc = "VSC_Bus_result" in result
 
-# 4) Print a short summary.
+# ── Summary ─────────────────────────────────────────────────────
+print("grid                :", GRID)
 print("baseMVA             :", round(float(result["baseMVA"]), 4))
 print("AC buses / DC buses :", len(ac), "/", len(dc))
 print("AC voltage min/max  :", round(ac["VM[pu]"].min(), 4), "/", round(ac["VM[pu]"].max(), 4), "pu")
 print("total AC load [MW]  :", round(ac["Load_P[MW]"].sum(), 2))
 print("detailed VSC        :", "yes" if has_vsc else "no")
 
-# 5) Print the full result tables (like the MATLAB command window).
+# ── Full result tables (like the MATLAB command window) ─────────
 print("\n===== AC bus result =====")
 print(ac.to_string(index=False))
 print("\n===== DC bus result =====")
@@ -65,7 +85,7 @@ if has_vsc:
     print("\n===== VSC power / losses =====")
     print(vsc_pow.to_string(index=False))
 
-# 6) Save results as CSV. The first row is the column names with units.
+# ── Save CSV (first row = unit-labeled headers) ─────────────────
 out = here / "results" / "runACDC_ex"
 out.mkdir(parents=True, exist_ok=True)
 ac.to_csv(out / "AC_result.csv", index=False)

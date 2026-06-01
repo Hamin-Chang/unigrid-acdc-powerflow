@@ -62,31 +62,37 @@ py run_unigrid.py
 ```
 </details>
 
-## The two scripts you run
+## Run from your editor (the easy way)
 
-- **`run_unigrid.py`** — basic run: load a grid, run the power flow, print/save results.
-- **`run_unigrid_scenarios.py`** — a **template you adapt yourself**. It shows the
-  pattern for building your own study (change a parameter, run it in a `for` loop);
-  edit it to fit your own scenarios rather than using it as-is.
+1. Run setup once (`bash setup_mac.sh` on macOS / `setup_windows.bat` on Windows).
+2. Open this folder in your editor (e.g. VS Code: File → Open Folder).
+   On macOS, VS Code auto-uses the `.venv` created by setup.
+3. Open **`run_unigrid.py`**, edit the **SETTINGS** block at the top, press **Run (▶)**.
 
-## Using your own grid
+The SETTINGS block lets you, without touching the rest of the code:
+- **pick a grid** — uncomment one `GRID = ...` line,
+- **scale the load** — set `LOAD_SCALE` (e.g. `1.10` for +10%).
 
-Replace the Excel filename in the script, or pass your own file:
 ```python
-case = load_acdc_case("my_grid.xlsx")
-```
-The Excel file must have the same sheet layout as the grids in `grids/`.
+# 1) Pick a grid: keep ONE line without the leading "#".
+GRID = "grids/ACDC_matacdc_case24_ieee_rts1996_3zones.xlsx"
+# GRID = "grids/ACDC_CIGRE_Benchmark.xlsx"
+# ...
 
-## Editing parameters (scenarios)
-
-After loading, the grid lives in editable tables. Change them, then run again:
-```python
-case = load_acdc_case("grids/ACDC_matacdc_case24_ieee_rts1996_3zones.xlsx")
-case.AC_PLoad_dat.iloc[:, 1:] *= 1.10   # +10% AC load
-result = run_acdc(case)
+# 2) (optional) Scale all AC loads. 1.0 = no change, 1.1 = +10%.
+LOAD_SCALE = 1.0
 ```
-Other tables you can edit: `AC_gen_dat` (generators), `AC_Line_dat` (lines),
-`IC_dat` (AC/DC converters), `DC_PLoad_dat` (DC load), and more.
+
+## Changing settings in more detail
+
+- **Different grid** → change the `GRID` line in `run_unigrid.py`, or use your own
+  `.xlsx` (same sheet layout as the files in `grids/`).
+- **Loads / generators / lines** → easiest is to **open the grid's Excel file and edit
+  the numbers** (that file *is* the input). For code-based tweaks, add lines after the
+  case is loaded, e.g. `case.AC_gen_dat.iloc[0, 5] *= 1.2`. Editable tables include
+  `AC_PLoad_dat`, `AC_gen_dat`, `AC_Line_dat`, `IC_dat`, `DC_PLoad_dat`, and more.
+- **Many scenarios at once** → see `run_unigrid_scenarios.py` (a template that loops
+  over parameter values; adapt it to your study).
 
 ## Example grids (`grids/`)
 
