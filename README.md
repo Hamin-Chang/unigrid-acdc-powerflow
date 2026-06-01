@@ -25,25 +25,42 @@ result = run_acdc(case)                                      # run the power flo
 
 ## Setup & run
 
-### Windows
-```bat
-py -m pip install .\runpfacdc_pkg_win\for_redistribution_files_only
-py -m pip install pandas openpyxl
-py run_unigrid.py
-```
+Use the helper scripts. They pick a supported Python (3.9–3.12), install
+dependencies, and run the example. **Python 3.13+ is not supported** by the MATLAB
+Runtime, so the scripts will find or install Python 3.12 for you.
 
 ### macOS
-Requires MATLAB R2024b (provides `mwpython`). mwpython needs a **Python 3.9–3.12**,
-so run from a virtual environment built on one of those versions:
+```bash
+bash setup_mac.sh      # one-time: creates a Python 3.12 venv and installs deps
+bash run_mac.sh        # run the power flow
+```
+(If Python 3.12 is missing, `setup_mac.sh` installs it via Homebrew.)
+
+### Windows
+```bat
+setup_windows.bat      :: one-time: installs the package and deps
+run_windows.bat        :: run the power flow
+```
+(Double-click the `.bat` files in Explorer, or run them from a terminal.)
+
+A successful run prints the result tables (AC / DC / branch / VSC) and saves CSV
+files under `results/`.
+
+<details><summary>Manual setup (without the scripts)</summary>
+
+macOS (needs a Python 3.9–3.12 venv — mwpython requires a real venv):
 ```bash
 python3.12 -m venv .venv
 .venv/bin/python -m pip install pandas openpyxl
 .venv/bin/python run_unigrid.py
 ```
-(Python 3.13+ will not work with the MATLAB Runtime.)
-
-A successful run prints a short summary (baseMVA, bus counts, voltage min/max,
-total load) and saves result CSV files under `results/`.
+Windows:
+```bat
+py -m pip install .\runpfacdc_pkg_win\for_redistribution_files_only
+py -m pip install pandas openpyxl
+py run_unigrid.py
+```
+</details>
 
 ## The two scripts you run
 
@@ -94,8 +111,10 @@ result = run_acdc(case)
 
 | File | Role |
 |------|------|
-| **`run_unigrid.py`** | ▶ Run one power flow (start here) |
-| **`run_unigrid_scenarios.py`** | ▶ Run a loop of scenarios |
+| **`setup_mac.sh` / `setup_windows.bat`** | One-time setup (Python + deps) |
+| **`run_mac.sh` / `run_windows.bat`** | Run the power flow |
+| `run_unigrid.py` | The basic example the run scripts call |
+| `run_unigrid_scenarios.py` | Loop / scenario example (a template to adapt) |
 | `load_case.py` | Engine: load Excel into editable tables |
 | `acdc_engine.py` | Engine: run the power flow (auto-selects the OS package) |
 | `_mac_worker.py` | Internal helper used on macOS only |
