@@ -33,11 +33,14 @@ py run_unigrid.py
 ```
 
 ### macOS
-(Requires MATLAB R2024b, which provides `mwpython`.)
+Requires MATLAB R2024b (provides `mwpython`). mwpython needs a **Python 3.9–3.12**,
+so run from a virtual environment built on one of those versions:
 ```bash
-python3 -m pip install pandas openpyxl
-python3 run_unigrid.py
+python3.12 -m venv .venv
+.venv/bin/python -m pip install pandas openpyxl
+.venv/bin/python run_unigrid.py
 ```
+(Python 3.13+ will not work with the MATLAB Runtime.)
 
 A successful run prints a short summary (baseMVA, bus counts, voltage min/max,
 total load) and saves result CSV files under `results/`.

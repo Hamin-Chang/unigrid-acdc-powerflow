@@ -174,7 +174,7 @@ def _run_via_mwpython(case: ACDCCase, mwpython: str | Path | None) -> dict[str, 
 
         command = [str(mw), str(WORKER), str(input_path), str(output_path)]
         env = os.environ.copy()
-        env.setdefault("VIRTUAL_ENV", str(_HERE / ".venv"))
+        env.setdefault("VIRTUAL_ENV", sys.prefix)  # mwpython은 지금 실행 중인 Python(venv)을 사용
         completed = subprocess.run(
             command, cwd=_HERE, env=env, text=True, capture_output=True, check=False
         )

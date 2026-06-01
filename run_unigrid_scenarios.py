@@ -17,6 +17,7 @@ import pandas as pd
 
 from load_case import load_acdc_case
 from acdc_engine import run_acdc
+from result_columns import to_df
 
 
 # >>> Change this filename to run your own grid file. <<<
@@ -33,5 +34,5 @@ for scale in scenarios:
     # --- to change generators/lines instead, edit that table above ----
 
     result = run_acdc(case)
-    min_vm = pd.DataFrame(result["AC_result"])[1].min()   # column 1 = voltage [pu]
+    min_vm = to_df(result, "AC_result")["VM[pu]"].min()
     print(f"load x{scale:.1f}  ->  min voltage {min_vm:.4f} pu")
