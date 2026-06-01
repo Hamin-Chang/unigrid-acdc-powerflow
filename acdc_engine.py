@@ -174,7 +174,14 @@ def _run_via_mwpython(case: ACDCCase, mwpython: str | Path | None) -> dict[str, 
 
         command = [str(mw), str(WORKER), str(input_path), str(output_path)]
         env = os.environ.copy()
-        env.setdefault("VIRTUAL_ENV", sys.prefix)  # mwpython은 지금 실행 중인 Python(venv)을 사용
+        # mwpython needs a Python 3.9-3.12 venv. Prefer the project's .venv (made by
+        # setup_mac.sh) so it works even if this script was launched with a different
+        # or unsupported Python (e.g. 3.13/3.14 from a VS Code Run button).
+        local_venv = _HERE / ".venv"
+        if (local_venv / "bin" / "python").exists():
+            env["VIRTUAL_ENV"] = str(local_venv)
+        else:
+            env.setdefault("VIRTUAL_ENV", sys.prefix)
         completed = subprocess.run(
             command, cwd=_HERE, env=env, text=True, capture_output=True, check=False
         )
