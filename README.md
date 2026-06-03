@@ -56,15 +56,16 @@ loops over parameter values; adapt it to your own study.
 
 ## Example grids (`grids/`)
 
-Five AC/DC test systems used in the paper, across three scales:
+Five AC/DC test systems used in the paper, across three scales
+(**ICs** = interlinking converters, the stations that link the AC and DC sides):
 
-| Grid file | Category | AC / DC buses |
-|-----------|----------|---------------|
-| `ACDC_matacdc_case24_ieee_rts1996_3zones.xlsx` | Transmission | 50 / 7 |
-| `ACDC_matacdc_stagg5_droop.xlsx` | Transmission | 5 / 3 |
-| `ACDC_CIGRE_Benchmark.xlsx` | Distribution | 14 / 11 |
-| `ACDC_71bus_3IC_parallel.xlsx` | Microgrid | 38 / 33 |
-| `ACDC_12bus_paper.xlsx` | Microgrid | 6 / 6 |
+| Grid file | Category | AC / DC buses | ICs |
+|-----------|----------|---------------|-----|
+| `ACDC_matacdc_case24_ieee_rts1996_3zones.xlsx` | Transmission | 50 / 7 | 7 |
+| `ACDC_matacdc_stagg5_droop.xlsx` | Transmission | 5 / 3 | 3 |
+| `ACDC_CIGRE_Benchmark.xlsx` | Distribution | 14 / 11 | 3 |
+| `ACDC_71bus_3IC_parallel.xlsx` | Microgrid | 38 / 33 | 3 |
+| `ACDC_12bus_paper.xlsx` | Microgrid | 6 / 6 | 1 |
 
 ## Files
 
