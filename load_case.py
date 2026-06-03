@@ -129,7 +129,10 @@ def _read_numeric_sheet(path: Path, sheet_name: str) -> pd.DataFrame:
     numeric = numeric.dropna(axis=0, how="all")
     numeric = numeric.reset_index(drop=True)
     numeric.columns = range(numeric.shape[1])
-    return numeric
+    # 모든 수치 표를 float로 통일한다. 정수로 읽힌 열(부하·정수 파라미터 등)에
+    # 실수를 곱하면(예: case.AC_PLoad_dat *= 1.1) pandas가 dtype 불일치 경고를
+    # 내며 향후 에러가 되므로, 처음부터 float64로 둔다(엔진도 MATLAB 전달 시 float).
+    return numeric.astype("float64")
 
 
 def _drop_first_row(matrix: pd.DataFrame) -> pd.DataFrame:
