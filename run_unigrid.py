@@ -25,10 +25,7 @@ GRID = "grids/ACDC_matacdc_case24_ieee_rts1996_3zones.xlsx"   # transmission  50
 # GRID = "grids/ACDC_12bus_paper.xlsx"                        # microgrid      6/6
 # GRID = "grids/your_own_file.xlsx"                           # your own grid
 
-# 2) (optional) Scale all AC loads.  1.0 = no change, 1.1 = +10%, 0.9 = -10%.
-LOAD_SCALE = 1.0
-
-# 3) (optional) Finer tweaks: edit the Excel file directly, or add lines such as
+# 2) (optional) Finer tweaks: edit the Excel file directly, or add lines such as
 #       case.AC_gen_dat.iloc[0, 5] *= 1.2          # +20% on the first generator
 #    just below where `case` is loaded (see "apply settings" section).
 # ════════════════════════════════════════════════════════════════
@@ -39,13 +36,10 @@ pd.set_option("display.max_rows", None)
 pd.set_option("display.max_columns", None)
 pd.set_option("display.width", None)
 
-# ── Load the grid, apply settings, run ──────────────────────────
+# ── Load the grid, (optionally edit), run ───────────────────────
 case = load_acdc_case(here / GRID)
 
-if LOAD_SCALE != 1.0:                       # apply settings
-    case.AC_PLoad_dat.iloc[:, 1:] *= LOAD_SCALE
-    case.AC_QLoad_dat.iloc[:, 1:] *= LOAD_SCALE
-# (add your own case.* edits here)
+# (optional) edit the case here, e.g.  case.AC_gen_dat.iloc[0, 5] *= 1.2
 
 result = run_acdc(case)
 

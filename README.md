@@ -23,9 +23,6 @@ GRID = "grids/ACDC_matacdc_case24_ieee_rts1996_3zones.xlsx"
 # GRID = "grids/ACDC_CIGRE_Benchmark.xlsx"
 # GRID = "grids/ACDC_71bus_3IC_parallel.xlsx"
 # ...
-
-# (optional) scale all AC loads: 1.0 = no change, 1.1 = +10%
-LOAD_SCALE = 1.0
 ```
 
 The results print in the terminal (AC / DC / branch / VSC tables) and are saved as
@@ -48,7 +45,6 @@ Everything you normally change lives in the **SETTINGS block** at the top of
 
 - **Different grid** → switch the `GRID` line (all six example grids are listed there),
   or point it to your own `.xlsx` with the same sheet layout as the files in `grids/`.
-- **Scale the load** → set `LOAD_SCALE` (e.g. `1.10` for +10%).
 
 For finer changes (individual buses, generators, lines), either **edit the grid's Excel
 file directly** (that file *is* the input), or add a line after the case is loaded, e.g.
