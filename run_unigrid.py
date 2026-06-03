@@ -20,7 +20,6 @@ from result_columns import to_df
 GRID = "grids/ACDC_matacdc_case24_ieee_rts1996_3zones.xlsx"   # transmission  50/7
 # GRID = "grids/ACDC_matacdc_stagg5_droop.xlsx"               # transmission   5/3
 # GRID = "grids/ACDC_CIGRE_Benchmark.xlsx"                    # distribution  14/11
-# GRID = "grids/ACDC_91bus_regional_distribution.xlsx"        # distribution  91/3
 # GRID = "grids/ACDC_71bus_3IC_parallel.xlsx"                 # microgrid     38/33
 # GRID = "grids/ACDC_12bus_paper.xlsx"                        # microgrid      6/6
 # GRID = "grids/your_own_file.xlsx"                           # your own grid

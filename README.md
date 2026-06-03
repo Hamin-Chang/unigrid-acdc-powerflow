@@ -43,7 +43,7 @@ CSV files under `results/`.
 Everything you normally change lives in the **SETTINGS block** at the top of
 `run_unigrid.py` — edit it and press Run (▶):
 
-- **Different grid** → switch the `GRID` line (all six example grids are listed there),
+- **Different grid** → switch the `GRID` line (all five example grids are listed there),
   or point it to your own `.xlsx` with the same sheet layout as the files in `grids/`.
 
 For finer changes (individual buses, generators, lines), either **edit the grid's Excel
@@ -56,14 +56,13 @@ loops over parameter values; adapt it to your own study.
 
 ## Example grids (`grids/`)
 
-Six AC/DC test systems used in the paper, across three scales:
+Five AC/DC test systems used in the paper, across three scales:
 
 | Grid file | Category | AC / DC buses |
 |-----------|----------|---------------|
 | `ACDC_matacdc_case24_ieee_rts1996_3zones.xlsx` | Transmission | 50 / 7 |
 | `ACDC_matacdc_stagg5_droop.xlsx` | Transmission | 5 / 3 |
 | `ACDC_CIGRE_Benchmark.xlsx` | Distribution | 14 / 11 |
-| `ACDC_91bus_regional_distribution.xlsx` | Distribution | 91 / 3 |
 | `ACDC_71bus_3IC_parallel.xlsx` | Microgrid | 38 / 33 |
 | `ACDC_12bus_paper.xlsx` | Microgrid | 6 / 6 |
 
