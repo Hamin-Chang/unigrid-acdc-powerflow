@@ -121,7 +121,7 @@ AC/DC test systems used in the paper (UniGrid Excel), across three scales
 | `ACDC_71bus_3IC_parallel.xlsx` | Microgrid | 38 / 33 | 3 |
 | `ACDC_12bus_paper.xlsx` | Microgrid | 6 / 6 | 1 |
 
-Plus three AC-only inputs that show the other supported formats:
+Plus five AC-only inputs that show the other supported formats:
 
 | Input file | Format | System | Mode |
 |------------|--------|--------|------|
@@ -134,7 +134,7 @@ Plus three AC-only inputs that show the other supported formats:
 The IEEE 14 and IEEE 118 systems are provided in **both** MATPOWER and PSS/E form, so
 you can confirm the two importers agree on the same network.
 
-Sources for these three are listed under [Acknowledgements](#acknowledgements).
+Sources for these examples are listed under [Acknowledgements](#acknowledgements).
 
 ## Files
 
