@@ -94,10 +94,16 @@ def load_acdc_case(excel_path: str | Path) -> ACDCCase:
         raise FileNotFoundError(f"Excel 파일을 찾을 수 없습니다: {path}")
 
     mode = _read_mode(path)
+    available = set(pd.ExcelFile(path).sheet_names)
 
     tables: dict[str, pd.DataFrame] = {}
     for key in TABLE_ORDER:
         sheet = SHEET_MAP[key]
+        if sheet not in available:
+            # 그 모드에 없는 시트(예: DC-only 파일엔 AC Gen/AC 3W 시트가 없음)는
+            # 빈 표로 둔다. Mode에 맞는 솔버가 그 계열 테이블을 안 읽으므로 무해하다.
+            tables[key] = pd.DataFrame()
+            continue
         matrix = _read_numeric_sheet(path, sheet)
         if key in LOAD_SHEETS:
             matrix = _drop_first_row(matrix)            # 시간 라벨 행 제거
@@ -105,6 +111,29 @@ def load_acdc_case(excel_path: str | Path) -> ACDCCase:
         tables[key] = matrix
 
     return ACDCCase(case_name=path.name, mode=mode, tables=tables)
+
+
+def load_case(path: str | Path) -> ACDCCase:
+    """입력 파일 확장자를 보고 알맞은 로더로 ACDCCase를 만든다.
+
+        .xlsx / .xls → UniGrid Excel (load_acdc_case)
+        .m           → MATPOWER m-file (unigrid_convert.matpower_to_case, AC-only)
+        .raw         → PSS/E raw       (unigrid_convert.psse_to_case, AC-only)
+
+    변환 파서는 순환 import를 피하려고 필요할 때 지연 import한다.
+    """
+    ext = Path(path).expanduser().suffix.lower()
+    if ext in (".xlsx", ".xls"):
+        return load_acdc_case(path)
+    if ext == ".m":
+        from unigrid_convert import matpower_to_case
+        return matpower_to_case(path)
+    if ext == ".raw":
+        from unigrid_convert import psse_to_case
+        return psse_to_case(path)
+    raise ValueError(
+        f"지원하지 않는 입력 형식입니다: '{ext}'. .xlsx / .xls / .m / .raw 만 지원합니다."
+    )
 
 
 def _read_mode(path: Path) -> float:
@@ -123,10 +152,16 @@ def _read_numeric_sheet(path: Path, sheet_name: str) -> pd.DataFrame:
     - 내부의 부분 NaN은 보존.
     """
     raw = pd.read_excel(path, sheet_name=sheet_name, header=None)
+    ncols = raw.shape[1]
     numeric = raw.apply(pd.to_numeric, errors="coerce")
     # 텍스트 헤더 행만 제거(전부-NaN 행). 열은 위치 보존을 위해 유지한다
     # (readmatrix는 헤더가 있는 열을 위치 그대로 NaN으로 유지하므로).
     numeric = numeric.dropna(axis=0, how="all")
+    if numeric.shape[0] == 0 and ncols > 0:
+        # 헤더만 있고 데이터가 없는 시트(예: 컨버터/DC발전기 없는 계통)는
+        # MATLAB readmatrix가 1×N NaN 행으로 준다. 컴파일된 전처리기 일부가
+        # `any(isnan(...))`로 '데이터 없음'을 감지하므로 그 형태를 맞춘다.
+        numeric = pd.DataFrame([[float("nan")] * ncols])
     numeric = numeric.reset_index(drop=True)
     numeric.columns = range(numeric.shape[1])
     # 모든 수치 표를 float로 통일한다. 정수로 읽힌 열(부하·정수 파라미터 등)에

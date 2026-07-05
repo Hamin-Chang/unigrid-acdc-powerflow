@@ -31,11 +31,13 @@ from load_case import ACDCCase, TABLE_ORDER
 
 _HERE = Path(__file__).resolve().parent
 
-# OS → 컴파일 패키지 폴더/모듈 이름
-PACKAGE_NAMES = {
-    "Darwin": "runpfacdc_pkg_mac",
-    "Windows": "runpfacdc_pkg_win",
-    "Linux": "runpfacdc_pkg_linux",
+# OS → 컴파일 패키지 폴더/모듈 이름 (후보 순서대로 탐색: 새 이름 우선, 옛 이름 fallback).
+# 새 통합 패키지 이름은 unigrid_pkg_<os> (runpf_unigrid_py 진입점, 전 모드).
+# 옛 하이브리드 전용 패키지(runpfacdc_pkg_<os>)가 남아 있으면 그것도 인식한다.
+PACKAGE_CANDIDATES = {
+    "Darwin": ("unigrid_pkg_mac", "runpfacdc_pkg_mac"),
+    "Windows": ("unigrid_pkg_win", "runpfacdc_pkg_win"),
+    "Linux": ("unigrid_pkg_linux", "runpfacdc_pkg_linux"),
 }
 
 WORKER = _HERE / "_mac_worker.py"
@@ -43,7 +45,11 @@ DEFAULT_MWPYTHON = Path("/Applications/MATLAB_R2024b.app/bin/mwpython")
 
 
 def _package_name() -> str:
-    return PACKAGE_NAMES.get(platform.system(), "runpfacdc_pkg")
+    candidates = PACKAGE_CANDIDATES.get(platform.system(), ("unigrid_pkg",))
+    for name in candidates:
+        if (_HERE / name).is_dir():
+            return name
+    return candidates[0]
 
 
 def _package_dir() -> Path:
@@ -116,7 +122,8 @@ def _run_in_process(case: ACDCCase) -> dict[str, Any]:
     app = pkg.initialize()
     try:
         args = [_to_matlab_matrix(case.tables[name]) for name in TABLE_ORDER]
-        result = app.runpfACDC_py(
+        entry = _resolve_entry(app, case.mode)
+        result = entry(
             case.case_name,
             float(case.mode),
             *args,
@@ -126,6 +133,28 @@ def _run_in_process(case: ACDCCase) -> dict[str, Any]:
         app.terminate()
 
     return _matlab_result_to_jsonable(result)
+
+
+def _resolve_entry(app: Any, mode: float) -> Any:
+    """컴파일 패키지에서 진입점 함수를 고른다.
+
+    새 패키지(runpf_unigrid_py)면 전 모드 지원. 구 패키지(runpfACDC_py)만
+    있으면 하이브리드(Mode 0)만 가능하므로 그 외 모드는 재컴파일을 안내한다.
+    """
+    fn = getattr(app, "runpf_unigrid_py", None)
+    if fn is not None:
+        return fn
+    fn = getattr(app, "runpfACDC_py", None)
+    if fn is not None:
+        if int(round(mode)) != 0:
+            raise RuntimeError(
+                "설치된 컴파일 패키지는 하이브리드(Mode 0)만 지원합니다(runpfACDC_py).\n"
+                "AC-only/DC-only(.m/.raw 포함)를 실행하려면 runpf_unigrid_py로 재컴파일하세요."
+            )
+        return fn
+    raise RuntimeError(
+        "컴파일 패키지에서 runpf_unigrid_py 또는 runpfACDC_py를 찾지 못했습니다."
+    )
 
 
 def _to_matlab_matrix(table: Any) -> Any:

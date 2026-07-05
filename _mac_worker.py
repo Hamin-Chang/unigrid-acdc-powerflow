@@ -14,13 +14,25 @@ from pathlib import Path
 from typing import Any
 
 
-PACKAGE_NAMES = {
-    "Darwin": "runpfacdc_pkg_mac",
-    "Windows": "runpfacdc_pkg_win",
-    "Linux": "runpfacdc_pkg_linux",
+# 후보 순서대로 탐색: 새 통합 패키지(unigrid_pkg_<os>) 우선, 옛 하이브리드 패키지 fallback.
+PACKAGE_CANDIDATES = {
+    "Darwin": ("unigrid_pkg_mac", "runpfacdc_pkg_mac"),
+    "Windows": ("unigrid_pkg_win", "runpfacdc_pkg_win"),
+    "Linux": ("unigrid_pkg_linux", "runpfacdc_pkg_linux"),
 }
-PKG_NAME = PACKAGE_NAMES.get(platform.system(), "runpfacdc_pkg")
-PACKAGE_ROOT = Path(__file__).resolve().parent / PKG_NAME / "for_testing"
+_HERE = Path(__file__).resolve().parent
+
+
+def _pick_package() -> str:
+    candidates = PACKAGE_CANDIDATES.get(platform.system(), ("unigrid_pkg",))
+    for name in candidates:
+        if (_HERE / name).is_dir():
+            return name
+    return candidates[0]
+
+
+PKG_NAME = _pick_package()
+PACKAGE_ROOT = _HERE / PKG_NAME / "for_testing"
 sys.path.insert(0, str(PACKAGE_ROOT))
 
 pkg = importlib.import_module(PKG_NAME)
@@ -45,9 +57,20 @@ def main() -> None:
     app = pkg.initialize()
     try:
         args = [_matrix(tables[name]) for name in TABLE_ORDER]
-        result = app.runpfACDC_py(
+        mode = float(case["mode"])
+        entry = getattr(app, "runpf_unigrid_py", None)
+        if entry is None:
+            entry = getattr(app, "runpfACDC_py", None)
+            if entry is not None and int(round(mode)) != 0:
+                raise SystemExit(
+                    "설치된 패키지는 하이브리드(Mode 0)만 지원합니다. "
+                    "AC-only/DC-only는 runpf_unigrid_py로 재컴파일하세요."
+                )
+        if entry is None:
+            raise SystemExit("runpf_unigrid_py / runpfACDC_py 진입점을 찾지 못했습니다.")
+        result = entry(
             case["case_name"],
-            float(case["mode"]),
+            mode,
             *args,
             nargout=1,
         )
