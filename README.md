@@ -175,6 +175,22 @@ py run_unigrid.py
 ```
 </details>
 
+## Project status & roadmap
+
+UniGrid is **actively maintained** by its author (Hamin Chang). A companion research
+paper describing the AC/DC formulation is in preparation.
+
+Planned work:
+
+- **Citation metadata** — add a `CITATION.cff` once the companion paper is published.
+- **More example systems** — additional AC-only and DC-only example inputs.
+- **Importer coverage** — broaden the MATPOWER (`.m`) and PSS/E (`.raw`) parsers
+  (more record types, larger cases).
+- **Packaging cleanup** — slim the distributed package and streamline setup.
+
+Questions, bug reports, and suggestions are welcome via
+[GitHub Issues](https://github.com/Hamin-Chang/unigrid-acdc-powerflow/issues).
+
 ## License
 
 The UniGrid source code and scripts in this repository are released under the
