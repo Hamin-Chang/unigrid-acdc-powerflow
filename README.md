@@ -121,6 +121,12 @@ AC/DC test systems used in the paper (UniGrid Excel), across three scales
 | `ACDC_71bus_3IC_parallel.xlsx` | Microgrid | 38 / 33 | 3 |
 | `ACDC_12bus_paper.xlsx` | Microgrid | 6 / 6 | 1 |
 
+A UniGrid Excel can also describe a pure DC network (its `Mode` sheet selects DC-only):
+
+| Grid file | Category | DC buses | Mode |
+|-----------|----------|----------|------|
+| `DConly_21bus.xlsx` | DC network | 21 | DC-only |
+
 Plus five AC-only inputs that show the other supported formats:
 
 | Input file | Format | System | Mode |

@@ -25,6 +25,7 @@ GRID = "grids/ACDC_matacdc_case24_ieee_rts1996_3zones.xlsx"   # AC/DC Hybrid  50
 # GRID = "grids/ACDC_CIGRE_Benchmark.xlsx"                    # AC/DC Hybrid  14/11
 # GRID = "grids/ACDC_71bus_3IC_parallel.xlsx"                 # AC/DC Hybrid  38/33
 # GRID = "grids/ACDC_12bus_paper.xlsx"                        # AC/DC Hybrid   6/6
+# GRID = "grids/DConly_21bus.xlsx"                            # UniGrid Excel → DC-only  21
 # GRID = "grids/matpower_ieee14.m"                            # MATPOWER  → AC-only
 # GRID = "grids/matpower_ieee118.m"                           # MATPOWER  → AC-only
 # GRID = "grids/psse_ieee14.raw"                              # PSS/E     → AC-only
