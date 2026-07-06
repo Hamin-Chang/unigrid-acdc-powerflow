@@ -169,6 +169,16 @@ py run_unigrid.py
 ```
 </details>
 
+## License
+
+The UniGrid source code and scripts in this repository are released under the
+**MIT License** (see [LICENSE](LICENSE)) — free to use, modify, and redistribute,
+including commercially, as long as the copyright notice is retained. The compiled
+solver is distributed as a binary package; its MATLAB source is not included.
+
+The bundled example inputs and the compiled MATLAB Runtime components are provided
+under their own terms; see [Acknowledgements](#acknowledgements) below.
+
 ## Acknowledgements
 
 The bundled example inputs come from established, openly documented test systems:
