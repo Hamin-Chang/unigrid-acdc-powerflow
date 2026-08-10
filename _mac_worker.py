@@ -35,6 +35,36 @@ PKG_NAME = _pick_package()
 PACKAGE_ROOT = _HERE / PKG_NAME / "for_testing"
 sys.path.insert(0, str(PACKAGE_ROOT))
 
+
+def _fix_apple_silicon_detection() -> None:
+    """Restore Apple Silicon detection on hosts where mac_ver() comes back empty.
+
+    The MATLAB-generated package __init__.py decides the architecture with
+    ``platform.mac_ver()[-1] == 'arm64'``. On some hosts mac_ver() returns
+    ``('', ('', '', ''), '')`` under mwpython: MATLAB puts its own library
+    directory first, and an older libexpat shipped there can break pyexpat,
+    which breaks plistlib, which is what mac_ver() reads. The empty value
+    makes an Apple Silicon Mac look like an Intel one (maci64), which
+    contradicts the runtime path (.../runtime/maca64), and the import fails
+    before the solver ever starts.
+
+    Fill the machine field from platform.machine() only when it is empty, so
+    hosts that report it correctly are left untouched.
+    """
+    original = platform.mac_ver
+
+    def patched():
+        version, dev_stage, machine = original()
+        if not machine:
+            return (version, dev_stage, platform.machine())
+        return (version, dev_stage, machine)
+
+    platform.mac_ver = patched  # type: ignore[assignment]
+
+
+if platform.system() == "Darwin":
+    _fix_apple_silicon_detection()
+
 pkg = importlib.import_module(PKG_NAME)
 import matlab  # type: ignore
 

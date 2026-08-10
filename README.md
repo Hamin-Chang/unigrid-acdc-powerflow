@@ -29,8 +29,10 @@ On macOS it auto-uses the environment that setup created.
 
 ```python
 # Pick a grid — keep ONE line without the leading "#":
-GRID = "grids/ACDC_matacdc_case24_ieee_rts1996_3zones.xlsx"   # AC/DC Hybrid
-# GRID = "grids/ACDC_matacdc_stagg5_droop.xlsx"               # AC/DC Hybrid
+GRID = "grids/rts96_scenario1_constant_vdc.xlsx"  # AC/DC Hybrid
+# GRID = "grids/cigre_scenario1_constant_vdc.xlsx"    # AC/DC Hybrid
+# GRID = "grids/mg71_S1_baseline.xlsx"                   # AC/DC Hybrid
+# GRID = "grids/stagg5_scenario2_droop.xlsx"               # AC/DC Hybrid
 # GRID = "grids/matpower_ieee14.m"                            # MATPOWER  → AC-only
 # GRID = "grids/matpower_ieee118.m"                           # MATPOWER  → AC-only
 # GRID = "grids/psse_ieee14.raw"                              # PSS/E     → AC-only
@@ -42,10 +44,10 @@ The mode is picked automatically from the file, so you only choose the grid. The
 results print in the terminal (AC / DC / branch / VSC tables, whichever the mode
 produces) and are saved as CSV files under `results/`.
 
-**Example run** — `ACDC_matacdc_stagg5_droop.xlsx` (a 5-bus AC / 3-bus DC hybrid grid):
+**Example run** — `stagg5_scenario2_droop.xlsx` (a 5-bus AC / 3-bus DC hybrid grid):
 
 ```text
-grid                : ACDC_matacdc_stagg5_droop.xlsx
+grid                : stagg5_scenario2_droop.xlsx
 mode                : AC/DC Hybrid
 baseMVA             : 100.0
 AC buses            : 5
@@ -110,24 +112,38 @@ loops over parameter values; adapt it to your own study.
 
 ## Example inputs (`grids/`)
 
-AC/DC test systems used in the paper (UniGrid Excel), across three scales
-(**ICs** = interlinking converters, the stations that link the AC and DC sides):
+### Case files behind the paper's results
 
-| Grid file | Category | AC / DC buses | ICs |
-|-----------|----------|---------------|-----|
-| `ACDC_matacdc_case24_ieee_rts1996_3zones.xlsx` | Transmission | 50 / 7 | 7 |
-| `ACDC_matacdc_stagg5_droop.xlsx` | Transmission | 5 / 3 | 3 |
-| `ACDC_CIGRE_Benchmark.xlsx` | Distribution | 14 / 11 | 3 |
-| `ACDC_71bus_3IC_parallel.xlsx` | Microgrid | 38 / 33 | 3 |
-| `ACDC_12bus_paper.xlsx` | Microgrid | 6 / 6 | 1 |
+These are the exact inputs used for the case studies, one file per scenario
+(**ICs** = interlinking converters, the stations that link the AC and DC sides).
+Running one reproduces the corresponding figure in the paper.
 
-A UniGrid Excel can also describe a pure DC network (its `Mode` sheet selects DC-only):
+| Grid file | System | AC / DC buses | ICs | Scenario |
+|-----------|--------|---------------|-----|----------|
+| `rts96_scenario1_constant_vdc.xlsx` | Modified IEEE RTS-96, transmission | 50 / 7 | 7 | Constant DC voltage |
+| `rts96_scenario2_droop.xlsx` | Modified IEEE RTS-96, transmission | 50 / 7 | 7 | DC voltage droop |
+| `cigre_scenario1_constant_vdc.xlsx` | Modified CIGRE benchmark, distribution | 14 / 11 | 3 | DC/DC in constant-voltage mode |
+| `cigre_scenario2_droop.xlsx` | Modified CIGRE benchmark, distribution | 14 / 11 | 3 | DC/DC in droop mode |
+| `mg71_S1_baseline.xlsx` | 71-bus islanded microgrid | 38 / 33 | 3 | Baseline |
+| `mg71_S2_deadband.xlsx` | 71-bus islanded microgrid | 38 / 33 | 3 | Generator droop deadband |
+| `mg71_S3_gen_qlimit.xlsx` | 71-bus islanded microgrid | 38 / 33 | 3 | Generator reactive-power limit |
+| `mg71_S4_ic_limit.xlsx` | 71-bus islanded microgrid | 38 / 33 | 3 | IC output limit |
+| `pandapower_3w.xlsx` | pandapower multi-voltage example network | 30 / — | — | Three-winding transformer cross-validation (AC-only) |
 
-| Grid file | Category | DC buses | Mode |
-|-----------|----------|----------|------|
-| `DConly_21bus.xlsx` | DC network | 21 | DC-only |
+The four microgrid files describe the same network; each turns on one control
+element so its effect can be read against the baseline.
+
+### Other example inputs
+
+A 5-bus AC / 3-bus DC hybrid system, not part of the case studies:
+
+| Grid file | Category | AC / DC buses | ICs | DC control |
+|-----------|----------|---------------|-----|------------|
+| `stagg5_scenario1_constant_vdc.xlsx` | Transmission | 5 / 3 | 3 | Constant DC voltage |
+| `stagg5_scenario2_droop.xlsx` | Transmission | 5 / 3 | 3 | DC voltage droop |
 
 Plus five AC-only inputs that show the other supported formats:
+
 
 | Input file | Format | System | Mode |
 |------------|--------|--------|------|
@@ -138,7 +154,16 @@ Plus five AC-only inputs that show the other supported formats:
 | `psse_3w_sample.raw` | PSS/E | 40-bus, three-winding transformer | AC-only |
 
 The IEEE 14 and IEEE 118 systems are provided in **both** MATPOWER and PSS/E form, so
-you can confirm the two importers agree on the same network.
+you can confirm the two importers agree on the same network. They agree bus for bus
+on both systems.
+
+> **Generator reactive-power limits are always enforced.** When a generator's `Qmax` /
+> `Qmin` is present in the input, UniGrid holds the generator at its limit and lets the
+> bus voltage leave its setpoint, resolved inside the same Newton–Raphson iteration.
+> MATPOWER's `runpf` leaves this off by default, so compare against
+> `mpoption('pf.enforce_q_lims', 1)`. Against that reference the two solutions agree to
+> within 5 × 10⁻⁵ p.u. on both IEEE 14 and IEEE 118; against MATPOWER's default they
+> differ wherever a limit binds (IEEE 118 does, IEEE 14 does not).
 
 Sources for these examples are listed under [Acknowledgements](#acknowledgements).
 

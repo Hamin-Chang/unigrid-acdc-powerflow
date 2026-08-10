@@ -15,3 +15,7 @@ Thumbs.db
 
 # 개인용 한글 설명서 (업로드 안 함)
 README_KR.md
+
+# MATLAB Compiler 부산물·백업 (업로드 안 함)
+PackagingLog.html
+*_backup_*/

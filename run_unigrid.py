@@ -20,18 +20,25 @@ from result_columns import to_df
 # ════════════════════════════════════════════════════════════════
 
 # 1) Pick a grid: keep ONE line without the leading "#".
-GRID = "grids/ACDC_matacdc_case24_ieee_rts1996_3zones.xlsx"   # AC/DC Hybrid  50/7
-# GRID = "grids/ACDC_matacdc_stagg5_droop.xlsx"               # AC/DC Hybrid   5/3
-# GRID = "grids/ACDC_CIGRE_Benchmark.xlsx"                    # AC/DC Hybrid  14/11
-# GRID = "grids/ACDC_71bus_3IC_parallel.xlsx"                 # AC/DC Hybrid  38/33
-# GRID = "grids/ACDC_12bus_paper.xlsx"                        # AC/DC Hybrid   6/6
-# GRID = "grids/DConly_21bus.xlsx"                            # UniGrid Excel → DC-only  21
-# GRID = "grids/matpower_ieee14.m"                            # MATPOWER  → AC-only
-# GRID = "grids/matpower_ieee118.m"                           # MATPOWER  → AC-only
-# GRID = "grids/psse_ieee14.raw"                              # PSS/E     → AC-only
-# GRID = "grids/psse_ieee118.raw"                             # PSS/E     → AC-only
-# GRID = "grids/psse_3w_sample.raw"                           # PSS/E, 3-winding → AC-only
-# GRID = "grids/your_own_file.xlsx"                           # your own grid
+#    The first block is the paper's case files, one line per scenario.
+GRID = "grids/rts96_scenario1_constant_vdc.xlsx"     # AC/DC Hybrid  50/7
+# GRID = "grids/rts96_scenario2_droop.xlsx"          # AC/DC Hybrid  50/7
+# GRID = "grids/cigre_scenario1_constant_vdc.xlsx"   # AC/DC Hybrid  14/11
+# GRID = "grids/cigre_scenario2_droop.xlsx"          # AC/DC Hybrid  14/11
+# GRID = "grids/mg71_S1_baseline.xlsx"               # AC/DC Hybrid  38/33
+# GRID = "grids/mg71_S2_deadband.xlsx"               # AC/DC Hybrid  38/33
+# GRID = "grids/mg71_S3_gen_qlimit.xlsx"             # AC/DC Hybrid  38/33
+# GRID = "grids/mg71_S4_ic_limit.xlsx"               # AC/DC Hybrid  38/33
+# GRID = "grids/pandapower_3w.xlsx"                  # UniGrid Excel → AC-only, 3-winding
+#    Other examples.
+# GRID = "grids/stagg5_scenario1_constant_vdc.xlsx"  # AC/DC Hybrid   5/3
+# GRID = "grids/stagg5_scenario2_droop.xlsx"         # AC/DC Hybrid   5/3
+# GRID = "grids/matpower_ieee14.m"                   # MATPOWER  → AC-only
+# GRID = "grids/matpower_ieee118.m"                  # MATPOWER  → AC-only
+# GRID = "grids/psse_ieee14.raw"                     # PSS/E     → AC-only
+# GRID = "grids/psse_ieee118.raw"                    # PSS/E     → AC-only
+# GRID = "grids/psse_3w_sample.raw"                  # PSS/E, 3-winding → AC-only
+# GRID = "grids/your_own_file.xlsx"                  # your own grid
 
 # 2) (optional) Finer tweaks: edit the file directly, or add lines such as
 #       case.AC_gen_dat.iloc[0, 5] *= 1.2          # +20% on the first generator
